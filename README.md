@@ -37,10 +37,52 @@ $ npm install @seneca/request
 
 
 <!--START:options-->
+
+
+## Options
+
+* `debug` : boolean <i><small>false</small></i>
+
+
+Set plugin options when loading with:
+```js
+
+
+seneca.use('request', { name: value, ... })
+
+
+```
+
+
+<small>Note: <code>foo.bar</code> in the list above means 
+<code>{ foo: { bar: ... } }</code></small> 
+
+
+
 <!--END:options-->
 
 <!--START:action-list-->
+
+
+## Action Patterns
+
+* [sys:request,request:send](#-sysrequestrequestsend-)
+
+
 <!--END:action-list-->
 
 <!--START:action-desc-->
+
+
+## Action Descriptions
+
+### &laquo; `sys:request,request:send` &raquo;
+
+Send a web request.
+
+
+
+----------
+
+
 <!--END:action-desc-->
