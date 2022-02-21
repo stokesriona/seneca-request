@@ -67,6 +67,7 @@ seneca.use('request', { name: value, ... })
 ## Action Patterns
 
 * [sys:request,request:send](#-sysrequestrequestsend-)
+* [sys:request,response:handle](#-sysrequestresponsehandle-)
 
 
 <!--END:action-list-->
@@ -79,6 +80,13 @@ seneca.use('request', { name: value, ... })
 ### &laquo; `sys:request,request:send` &raquo;
 
 Send a web request.
+
+
+
+----------
+### &laquo; `sys:request,response:handle` &raquo;
+
+No description provided.
 
 
 

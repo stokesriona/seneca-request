@@ -7,8 +7,18 @@ export default {
 
   calls: [
     {
+      pattern: 'response:handle',
+    },
+
+    {
+      print: true,
       pattern: 'request:send',
-      out: { ok: true },
+      params: { url: 'http://localhost:41414/test.json' },
+      out: {
+        ok: true,
+        status: 200,
+        json: { test: true }
+      },
     }
   ]
 }
