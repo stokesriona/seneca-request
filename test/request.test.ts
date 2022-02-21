@@ -49,4 +49,33 @@ describe('request', () => {
       .use(request)
     await (SenecaMsgTest(seneca, RequestMessages)())
   })
+
+
+  test('later', (fin) => {
+    Seneca({ legacy: false })
+      .test()
+      .use('promisify')
+      .use(request)
+      .sub('sys:request,response:handle', function(out: any) {
+        expect(out).toMatchObject({
+          url: 'http://localhost:41414/test.json',
+          id: 't01',
+          ctx: { foo: 1 },
+          sys: 'request',
+          request: null,
+          mode: 'later',
+          ok: true,
+          status: 200,
+          json: { test: true },
+        })
+
+        fin()
+      })
+      .act('sys:request,request:send,mode:later', {
+        url: 'http://localhost:41414/test.json',
+        id: 't01',
+        ctx: { foo: 1 }
+      })
+  })
+
 })

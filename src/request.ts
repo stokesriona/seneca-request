@@ -16,26 +16,46 @@ function request(this: any, options: RequestOptions) {
 
 
   async function request_send(this: any, msg: any) {
-    let id = msg.id || this.util.Nid()
-    let url = msg.url
-    let mode = msg.mode || 'now'
+    const seneca = this
 
-    if ('now' === mode) {
-      let response = await Fetch(url)
-      let ok = response.ok
-      let status = response.status
-      let json = null
+    msg.id = msg.id || this.util.Nid()
+    msg.mode = msg.mode || 'now'
 
-      if (response.ok) {
-        json = await response.json()
-      }
-
-      return { ok, id, status, json }
+    if ('now' === msg.mode) {
+      return await exec_request(msg)
     }
-    else {
-      return { ok: true, id }
+    else if ('later' === msg.mode) {
+      exec_request(msg)
+        .then((res: any) => {
+          seneca.act({
+            ...msg, ok: true, ...res, request: null, response: 'handle'
+          })
+        })
+        .catch((err: any) => {
+          seneca.act('sys:request,response:handle', {
+            ...msg, ok: false, err, request: null, response: 'handle'
+          })
+        })
+      return { ...msg, ok: true, id: msg.id }
     }
   }
+
+
+  async function exec_request(msg: any) {
+    let url = msg.url
+
+    let response = await Fetch(url)
+    let ok = response.ok
+    let status = response.status
+    let json = null
+
+    if (response.ok) {
+      json = await response.json()
+    }
+
+    return { ...msg, ok, status, json }
+  }
+
 
   async function response_handle(this: any, _msg: any) {
     // Does nothing, use seneca.sub('sys:request,response:handle')

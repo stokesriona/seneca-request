@@ -11,7 +11,7 @@ export default {
     },
 
     {
-      print: true,
+      print: false,
       pattern: 'request:send',
       params: { url: 'http://localhost:41414/test.json' },
       out: {
