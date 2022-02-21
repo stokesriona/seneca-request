@@ -5,6 +5,7 @@ import * as http from 'http'
 import serve from 'serve-handler'
 
 import request from '../src/request'
+import requestDoc from '../src/request-doc'
 
 const Seneca = require('seneca')
 const SenecaMsgTest = require('seneca-msg-test')
@@ -39,6 +40,7 @@ describe('request', () => {
       .use('promisify')
       .use(request)
     await seneca.ready()
+    expect(requestDoc).toBeDefined()
   })
 
 
