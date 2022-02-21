@@ -80,4 +80,100 @@ describe('request', () => {
       })
   })
 
+
+  test('spread', (fin) => {
+    let items = [
+      {
+        url: 'http://localhost:41414/test.json?01',
+      },
+      {
+        url: 'http://localhost:41414/test.json?02',
+      },
+      {
+        url: 'http://localhost:41414/test.json?03',
+      },
+      {
+        url: 'http://localhost:41414/test.json?04',
+      },
+    ]
+    let time = {
+      max: 1111,
+      tolerance: 0.1,
+      avgdur: 200,
+    }
+
+    let res = {}
+    Seneca({ legacy: false })
+      .test()
+      .use('promisify')
+      .use(request)
+      .sub('sys:request,response:handle', function(out: any) {
+        res[out.spread.item] = out
+        // console.log('TEST-RES', out, Object.keys(res))
+        if (items.length === Object.keys(res).length) {
+          // console.log('TEST-RES-ALL', res)
+
+          expect(res).toMatchObject({
+            '0': {
+              url: 'http://localhost:41414/test.json?01',
+              spread: { sid: 's01', item: 0 },
+              sys: 'request',
+              request: null,
+              mode: 'later',
+              ok: true,
+              status: 200,
+              json: { test: true },
+              response: 'handle',
+            },
+            '1': {
+              url: 'http://localhost:41414/test.json?02',
+              spread: { sid: 's01', item: 1 },
+              sys: 'request',
+              request: null,
+              mode: 'later',
+              ok: true,
+              status: 200,
+              json: { test: true },
+              response: 'handle',
+            },
+            '2': {
+              url: 'http://localhost:41414/test.json?03',
+              spread: { sid: 's01', item: 2 },
+              sys: 'request',
+              request: null,
+              mode: 'later',
+              ok: true,
+              status: 200,
+              json: { test: true },
+              response: 'handle',
+            },
+            '3': {
+              url: 'http://localhost:41414/test.json?04',
+              spread: { sid: 's01', item: 3 },
+              sys: 'request',
+              request: null,
+              mode: 'later',
+              ok: true,
+              status: 200,
+              json: { test: true },
+              response: 'handle',
+            }
+          })
+
+          // Expect the gap between start values to approx equal the
+          // expected average request duration.
+          let st = Object.values(res).map((r: any) => r.start)
+          let actdur = (time.avgdur + st[st.length - 1] - st[0]) / items.length
+          expect(Math.abs(actdur - time.avgdur) < 22).toBeTruthy()
+
+          fin()
+        }
+      })
+      .act('sys:request,request:spread,mode:later', {
+        sid: 's01',
+        time,
+        items,
+      })
+  })
+
 })

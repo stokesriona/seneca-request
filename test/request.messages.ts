@@ -3,13 +3,9 @@
 export default {
   print: false,
   pattern: 'sys:request',
-  allow: { missing: false },
+  allow: { missing: true },
 
   calls: [
-    {
-      pattern: 'response:handle',
-    },
-
     {
       print: false,
       pattern: 'request:send',
