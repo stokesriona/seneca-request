@@ -59,11 +59,12 @@ function request(options) {
                 let item = items[itemI];
                 // console.log('ITEM', itemI, 'L', items.length, 'D', Date.now() - start, item)
                 seneca.act({
+                    kind: msg.kind,
                     ...item,
                     spread: { sid, item: itemI },
                     sys: 'request',
                     request: 'send',
-                    mode: 'later'
+                    mode: 'later',
                 });
             }
         }, gap);
