@@ -92,17 +92,24 @@ function request(this: any, options: RequestOptions) {
 
   async function exec_request(msg: any) {
     let url = msg.url
+    let kind = msg.kind || 'json'
 
     let response = await Fetch(url)
     let ok = response.ok
     let status = response.status
     let json = null
+    let text = null
 
     if (response.ok) {
-      json = await response.json()
+      if ('json' === kind) {
+        json = await response.json()
+      }
+      else {
+        text = await response.text()
+      }
     }
 
-    return { ...msg, ok, status, json, end: Date.now() }
+    return { ...msg, ok, status, json, text, end: Date.now() }
   }
 
 

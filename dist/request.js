@@ -71,14 +71,21 @@ function request(options) {
     }
     async function exec_request(msg) {
         let url = msg.url;
+        let kind = msg.kind || 'json';
         let response = await Fetch(url);
         let ok = response.ok;
         let status = response.status;
         let json = null;
+        let text = null;
         if (response.ok) {
-            json = await response.json();
+            if ('json' === kind) {
+                json = await response.json();
+            }
+            else {
+                text = await response.text();
+            }
         }
-        return { ...msg, ok, status, json, end: Date.now() };
+        return { ...msg, ok, status, json, text, end: Date.now() };
     }
     async function response_handle(_msg) {
         // Does nothing, use seneca.sub('sys:request,response:handle')
