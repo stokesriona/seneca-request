@@ -1,6 +1,6 @@
 {
   "name": "@seneca/request",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "main": "dist/request.js",
   "type": "commonjs",
   "types": "dist/request.d.ts",

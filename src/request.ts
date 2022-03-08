@@ -4,7 +4,9 @@
 const Fetch = require('node-fetch')
 
 
-type RequestOptions = {}
+type RequestOptions = {
+  debug: boolean
+}
 
 
 function request(this: any, options: RequestOptions) {
@@ -36,6 +38,10 @@ function request(this: any, options: RequestOptions) {
           })
         })
         .catch((err: any) => {
+          if (options.debug) {
+            console.log('ERR', err)
+          }
+
           msg.end = Date.now()
           seneca.act('sys:request,response:handle', {
             ...msg, ok: false, err, request: null, response: 'handle'
@@ -49,9 +55,18 @@ function request(this: any, options: RequestOptions) {
   async function request_spread(this: any, msg: any) {
     const seneca = this
 
+    // console.log('SPREAD', msg)
+
     let sid = msg.sid || this.util.Nid()
     let items = msg.items
     let time = msg.time
+    let headers = msg.headers || {}
+
+    if (0 === items.length) {
+      return { sid, time, numitems: items.length }
+    }
+
+
     let max = time.max
     let avgdur = time.avgdur
     let tolerance = time.tolerance
@@ -65,6 +80,7 @@ function request(this: any, options: RequestOptions) {
 
     // console.log('TIME', interval, 'G', gap, 'T', time)
 
+
     let start = Date.now()
     let itemI = -1
     let iid = setInterval(() => {
@@ -75,8 +91,10 @@ function request(this: any, options: RequestOptions) {
       else {
         let item = items[itemI]
         // console.log('ITEM', itemI, 'L', items.length, 'D', Date.now() - start, item)
+
         seneca.act({
           kind: msg.kind,
+          headers,
           ...item,
           spread: { sid, item: itemI },
           sys: 'request',
@@ -94,8 +112,9 @@ function request(this: any, options: RequestOptions) {
   async function exec_request(msg: any) {
     let url = msg.url
     let kind = msg.kind || 'json'
+    let headers = msg.headers || {}
 
-    let response = await Fetch(url)
+    let response = await Fetch(url, { headers })
     let ok = response.ok
     let status = response.status
     let json = null
@@ -108,6 +127,9 @@ function request(this: any, options: RequestOptions) {
       else {
         text = await response.text()
       }
+    }
+    else {
+      text = await response.text()
     }
 
     return { ...msg, ok, status, json, text, end: Date.now() }
