@@ -26,7 +26,7 @@ describe('request', () => {
       return serve(request, response, { public: __dirname + '/serve' })
     })
     await new Promise((r, j) =>
-      server.listen(port, (err: any) => err ? j(err) : r()))
+      server.listen(port, (err: any) => err ? j(err) : r(null)))
   })
 
   afterAll(async () => {
@@ -109,9 +109,7 @@ describe('request', () => {
       .use(request)
       .sub('sys:request,response:handle', function(out: any) {
         res[out.spread.item] = out
-        // console.log('TEST-RES', out, Object.keys(res))
         if (items.length === Object.keys(res).length) {
-          // console.log('TEST-RES-ALL', res)
 
           expect(res).toMatchObject({
             '0': {

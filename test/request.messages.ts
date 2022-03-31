@@ -7,7 +7,6 @@ export default {
 
   calls: [
     {
-      print: false,
       pattern: 'request:send',
       params: { url: 'http://localhost:41414/test.json' },
       out: {
@@ -15,7 +14,29 @@ export default {
         status: 200,
         json: { test: true }
       },
-    }
+    },
+
+    {
+      pattern: 'request:send',
+      params: { url: 'http://localhost:41414/missing.json' },
+      out: {
+        ok: false,
+        status: 404,
+      },
+    },
+
+    {
+      pattern: 'request:send',
+      params: { url: 'http://not-a-host:41414/missing.json' },
+      out: {
+        ok: false,
+        status: -1,
+        err: {
+          code: 'ENOTFOUND'
+        }
+      },
+    },
+
   ]
 }
 
