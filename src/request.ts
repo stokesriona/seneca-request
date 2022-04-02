@@ -4,6 +4,7 @@
 const Fetch = require('node-fetch')
 
 
+
 type RequestOptions = {
   debug: boolean
 }
@@ -25,8 +26,6 @@ function request(this: any, options: RequestOptions) {
     msg.mode = msg.mode || 'now'
     msg.start = Date.now()
 
-    // console.log('SEND', msg)
-
     if ('now' === msg.mode) {
       return await exec_request(msg)
     }
@@ -38,10 +37,6 @@ function request(this: any, options: RequestOptions) {
           })
         })
         .catch((err: any) => {
-          if (options.debug) {
-            console.log('ERR', err)
-          }
-
           msg.end = Date.now()
           seneca.act('sys:request,response:handle', {
             ...msg, ok: false, err, request: null, response: 'handle'
@@ -54,8 +49,6 @@ function request(this: any, options: RequestOptions) {
 
   async function request_spread(this: any, msg: any) {
     const seneca = this
-
-    // console.log('SPREAD', msg)
 
     let sid = msg.sid || this.util.Nid()
     let items = msg.items
@@ -78,9 +71,6 @@ function request(this: any, options: RequestOptions) {
     let interval = max * (1 - tolerance)
     let gap = (interval - avgdur) / items.length
 
-    // console.log('TIME', interval, 'G', gap, 'T', time)
-
-
     let start = Date.now()
     let itemI = -1
     let iid = setInterval(() => {
@@ -90,13 +80,11 @@ function request(this: any, options: RequestOptions) {
       }
       else {
         let item = items[itemI]
-        // console.log('ITEM', itemI, 'L', items.length, 'D', Date.now() - start, item)
-
         seneca.act({
           kind: msg.kind,
           headers,
           ...item,
-          spread: { sid, item: itemI },
+          spread: { sid, item: itemI, start },
           sys: 'request',
           request: 'send',
           mode: 'later',
@@ -108,31 +96,40 @@ function request(this: any, options: RequestOptions) {
   }
 
 
-
   async function exec_request(msg: any) {
     let url = msg.url
     let kind = msg.kind || 'json'
     let headers = msg.headers || {}
 
-    let response = await Fetch(url, { headers })
-    let ok = response.ok
-    let status = response.status
+    let err = undefined
+    let ok = false
+    let status = -1
     let json = null
     let text = null
 
-    if (response.ok) {
-      if ('json' === kind) {
-        json = await response.json()
+    try {
+
+      let response = await Fetch(url, { headers })
+      ok = response.ok
+      status = response.status
+
+      if (response.ok) {
+        if ('json' === kind) {
+          json = await response.json()
+        }
+        else {
+          text = await response.text()
+        }
       }
       else {
         text = await response.text()
       }
-    }
-    else {
-      text = await response.text()
+
+    } catch (ex) {
+      err = ex
     }
 
-    return { ...msg, ok, status, json, text, end: Date.now() }
+    return { ...msg, ok, status, err, json, text, end: Date.now() }
   }
 
 
