@@ -11,6 +11,8 @@ const Seneca = require('seneca')
 const SenecaMsgTest = require('seneca-msg-test')
 const RequestMessages = require('./request.messages').default
 
+const { Maintain } = require('@seneca/maintain')
+
 
 describe('request', () => {
 
@@ -175,3 +177,5 @@ describe('request', () => {
   })
 
 })
+
+Maintain()
