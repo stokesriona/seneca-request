@@ -7,11 +7,11 @@ import serve from 'serve-handler'
 import request from '../src/request'
 import requestDoc from '../src/request-doc'
 
+import { Maintain } from '@seneca/maintain'
+
 const Seneca = require('seneca')
 const SenecaMsgTest = require('seneca-msg-test')
 const RequestMessages = require('./request.messages').default
-
-const { Maintain } = require('@seneca/maintain')
 
 
 describe('request', () => {
@@ -176,6 +176,6 @@ describe('request', () => {
       })
   })
 
-})
+  test('maintain', Maintain)
 
-Maintain()
+})
